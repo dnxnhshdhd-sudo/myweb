@@ -50,9 +50,9 @@
         .img-card { position: relative; border-radius: 12px; overflow: hidden; background: #ffffff; aspect-ratio: 1 / 1; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .img-card img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
         .img-card img:hover { transform: scale(1.05); }
-        .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; }
+        .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; z-index: 5; }
 
-        /* Lightbox xem ảnh full */
+        /* Lightbox xem ảnh to */
         .lightbox { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
         .lightbox-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; cursor: pointer; font-weight: bold; }
@@ -71,7 +71,7 @@
         <div class="site-title">📸 MyGallery</div>
     </div>
 
-    <!-- Nút Nổ / Logo Admin ở góc phải màn hình -->
+    <!-- Nút Logo Admin ở góc phải -->
     <div class="admin-float-btn" onclick="toggleMenu()" title="Admin Menu">⚙️</div>
 
     <!-- Menu thả xuống của Admin -->
@@ -80,12 +80,12 @@
             <h4>👥 NGƯỜI DÙNG TRUY CẬP</h4>
             <div id="userListArea"></div>
 
-            <h4>🛠 ĐĂNG NỘI DUNG</h4>
-            <label>Tải ảnh lên:</label>
+            <h4>🛠 TẢI ẢNH TỪ THƯ VIỆN</h4>
+            <label>Chọn ảnh từ máy:</label>
             <input type="file" id="imgInput" accept="image/*">
-            <button class="btn-login" onclick="addSingleImage()">Đăng Ảnh</button>
+            <button class="btn-login" onclick="addSingleImage()">Đăng Lên Web</button>
 
-            <label>Thêm chữ tự do:</label>
+            <h4>✍️ THÊM CHỮ KÉO THẢ</h4>
             <textarea id="textInput" placeholder="Nhập văn bản..."></textarea>
             <button class="btn-login" onclick="addCustomText()">Tạo Văn Bản</button>
 
@@ -121,7 +121,6 @@
     </div>
 
     <script>
-        // Tạo ID người dùng
         let myUserId = localStorage.getItem('my_user_id');
         if (!myUserId) {
             myUserId = 'Khách #' + Math.floor(1000 + Math.random() * 9000);
@@ -147,6 +146,8 @@
 
         let ADMIN_PASS = localStorage.getItem('my_admin_pass') || "hungmod34"; 
         let isAdmin = false;
+        
+        // Dùng chung một kho lưu trữ để mọi thiết bị truy cập đều thấy ảnh
         let savedImages = JSON.parse(localStorage.getItem('my_web_photos')) || [];
         let savedTexts = JSON.parse(localStorage.getItem('my_web_texts')) || [];
 
@@ -270,15 +271,17 @@
         function addSingleImage() {
             const fileInput = document.getElementById('imgInput');
             const file = fileInput.files[0];
-            if (!file) { alert("Chọn ảnh đi đã!"); return; }
+            if (!file) { alert("Chọn file ảnh từ thư viện đi đã!"); return; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
+                // Tự động chuyển ảnh thành mã nội tuyến lưu vào kho chung
                 savedImages.push(e.target.result);
                 localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
                 renderGallery();
                 fileInput.value = ''; 
                 document.getElementById('adminMenu').style.display = 'none';
+                alert("Đăng ảnh thành công!");
             };
             reader.readAsDataURL(file);
         }
