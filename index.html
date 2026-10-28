@@ -8,35 +8,48 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; padding: 20px; text-align: center; }
         
-        /* Header chứa nút admin ở góc phải */
-        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 20px auto; padding: 0 10px; }
-        .site-title { font-size: 1.5rem; font-weight: bold; color: #0284c7; }
-        .auth-container { display: flex; gap: 8px; }
-
-        .container { max-width: 1000px; margin: 0 auto; }
-        h1 { color: #0f172a; margin-bottom: 5px; font-size: 2rem; }
-        p.subtitle { color: #64748b; margin-bottom: 25px; }
+        /* Màn hình Ban */
+        #banScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #ef4444; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 2rem; font-weight: bold; padding: 20px; }
         
-        .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        button { padding: 10px 18px; border-radius: 8px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        /* Header góc phải */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 20px auto; padding: 0 10px; }
+        .site-title { font-size: 1.2rem; font-weight: bold; color: #0284c7; }
+        .auth-container { position: relative; display: inline-block; }
+
+        button { padding: 8px 16px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
         .btn-login { background: #0ea5e9; color: #fff; }
         .btn-login:hover { background: #0284c7; }
         .btn-logout { background: #ef4444; color: #fff; }
         .btn-share { background: #e2e8f0; color: #334155; }
         .btn-share:hover { background: #cbd5e1; }
 
-        .admin-panel { background: #ffffff; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: none; text-align: left; }
-        .admin-panel h3 { color: #0ea5e9; margin-bottom: 12px; }
-        .admin-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
-        input[type="file"] { background: #f8fafc; padding: 8px; border-radius: 6px; color: #334155; border: 1px solid #cbd5e1; }
-        
+        /* Menu Admin kiểu Dropdown rộng hơn để chứa danh sách người dùng */
+        .admin-dropdown { display: none; position: absolute; right: 0; top: 40px; background: #ffffff; width: 320px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; z-index: 100; text-align: left; padding: 15px; max-height: 80vh; overflow-y: auto; }
+        .admin-dropdown h4 { color: #0ea5e9; margin-bottom: 8px; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-top: 10px; }
+        .admin-dropdown h4:first-child { margin-top: 0; }
+        .admin-dropdown label { font-size: 12px; color: #64748b; display: block; margin-top: 6px; }
+        .admin-dropdown input, .admin-dropdown textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; background: #f8fafc; }
+        .admin-dropdown button { width: 100%; margin-top: 8px; }
+
+        /* List người dùng */
+        .user-list-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px 10px; border-radius: 6px; margin-top: 6px; border: 1px solid #e2e8f0; font-size: 13px; }
+        .btn-small-ban { background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
+        .btn-small-unban { background: #22c55e; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+        .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
+
+        /* Khung văn bản tự do kéo thả */
+        .draggable-text { position: absolute; cursor: move; padding: 10px; user-select: none; z-index: 10; border: 2px dashed transparent; }
+        .draggable-text:hover { border-color: #0ea5e9; background: rgba(14, 165, 233, 0.05); border-radius: 6px; }
+
         .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 10px; }
         .img-card { position: relative; border-radius: 12px; overflow: hidden; background: #ffffff; aspect-ratio: 1 / 1; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
         .img-card img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
         .img-card img:hover { transform: scale(1.05); }
         .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; }
 
-        /* Modal xem ảnh full */
+        /* Lightbox xem ảnh to */
         .lightbox { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
         .lightbox-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; cursor: pointer; font-weight: bold; }
@@ -44,32 +57,46 @@
 </head>
 <body>
 
-    <!-- Header góc phải có nút đăng nhập admin -->
+    <!-- Màn hình khi bị Ban -->
+    <div id="banScreen">
+        <p>🚫 Địt cụ mày bị ban rồi!</p>
+        <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">Biết điều thì cút ra chỗ khác chơi nhé.</p>
+    </div>
+
+    <!-- Header góc phải có menu Admin -->
     <div class="header-bar">
         <div class="site-title">📸 MyGallery</div>
         <div class="auth-container">
-            <button id="btnLogin" class="btn-login" onclick="loginAdmin()">🔑 Admin</button>
-            <button id="btnLogout" class="btn-logout" onclick="logoutAdmin()" style="display:none;">🚪 Thoát</button>
+            <button id="btnLogin" class="btn-login" onclick="toggleMenu()">🔑 Admin Menu</button>
+            <button id="btnLogout" class="btn-logout" onclick="logoutAdmin()" style="display:none;">🚪 Thoát Admin</button>
+            
+            <!-- Menu thả xuống của Admin -->
+            <div id="adminMenu" class="admin-dropdown">
+                <h4>👥 NGƯỜI DÙNG TRUY CẬP</h4>
+                <div id="userListArea"></div>
+
+                <h4>🛠 QUẢN LÝ NỘI DUNG</h4>
+                <label>Tải ảnh lên:</label>
+                <input type="file" id="imgInput" accept="image/*">
+                <button class="btn-login" onclick="addSingleImage()">Đăng Ảnh</button>
+
+                <label>Thêm văn bản tùy chỉnh:</label>
+                <textarea id="textInput" placeholder="Nhập chữ ở đây..."></textarea>
+                <button class="btn-login" onclick="addCustomText()">Tạo Văn Bản</button>
+
+                <h4>⚙️ CÀI ĐẶT HỆ THỐNG</h4>
+                <button class="btn-share" onclick="changePass()" style="background:#f1f5f9; color:#0f172a;">Đổi Mật Khẩu</button>
+            </div>
         </div>
     </div>
 
     <div class="container">
-        <h1>BỘ SỰU TẬP ẢNH</h1>
-        <p class="subtitle">Không gian lưu giữ ảnh của riêng tao</p>
-
         <div class="top-bar">
             <button class="btn-share" onclick="shareWeb()">🔗 Copy Link Web</button>
         </div>
 
-        <!-- Khung Admin -->
-        <div id="adminArea" class="admin-panel">
-            <h3>🛠 QUYỀN ADMIN ĐANG BẬT</h3>
-            <div class="admin-actions">
-                <input type="file" id="imgInput" accept="image/*">
-                <button class="btn-login" onclick="addSingleImage()">Tải Ảnh Up</button>
-                <button class="btn-share" onclick="changePass()">Đổi Mật Khẩu</button>
-            </div>
-        </div>
+        <!-- Khu vực chứa văn bản kéo thả -->
+        <div id="textContainer"></div>
 
         <!-- Bộ sưu tập ảnh -->
         <div class="gallery" id="gallery"></div>
@@ -82,9 +109,134 @@
     </div>
 
     <script>
+        // Tạo hoặc lấy ID duy nhất cho trình duyệt này
+        let myUserId = localStorage.getItem('my_user_id');
+        if (!myUserId) {
+            myUserId = 'Khách #' + Math.floor(1000 + Math.random() * 9000);
+            localStorage.setItem('my_user_id', myUserId);
+        }
+
+        // Quản lý danh sách người dùng & Banned trong localStorage
+        let activeUsers = JSON.parse(localStorage.getItem('web_active_users')) || [];
+        let bannedUsers = JSON.parse(localStorage.getItem('web_banned_users')) || [];
+
+        // Đăng ký người dùng hiện tại vào danh sách
+        if (!activeUsers.includes(myUserId)) {
+            activeUsers.push(myUserId);
+            localStorage.setItem('web_active_users', JSON.stringify(activeUsers));
+        }
+
+        // Kiểm tra xem ID này có bị Ban không
+        function checkBanStatus() {
+            if (bannedUsers.includes(myUserId) || localStorage.getItem('is_banned') === 'true') {
+                document.getElementById('banScreen').style.display = 'flex';
+            } else {
+                document.getElementById('banScreen').style.display = 'none';
+            }
+        }
+        checkBanStatus();
+
         let ADMIN_PASS = localStorage.getItem('my_admin_pass') || "hungmod34"; 
         let isAdmin = false;
         let savedImages = JSON.parse(localStorage.getItem('my_web_photos')) || [];
+        let savedTexts = JSON.parse(localStorage.getItem('my_web_texts')) || [];
+
+        function toggleMenu() {
+            if (!isAdmin) {
+                let pass = prompt("Nhập mật khẩu Admin:");
+                if (pass === ADMIN_PASS) {
+                    isAdmin = true;
+                    alert("Đăng nhập Admin thành công!");
+                    document.getElementById('btnLogin').style.display = 'none';
+                    document.getElementById('btnLogout').style.display = 'inline-block';
+                    renderGallery();
+                    renderTexts();
+                } else if (pass !== null) {
+                    alert("Sai mật khẩu rồi cu!");
+                    return;
+                } else {
+                    return;
+                }
+            }
+            let menu = document.getElementById('adminMenu');
+            let isOpening = menu.style.display !== 'block';
+            menu.style.display = isOpening ? 'block' : 'none';
+
+            if (isOpening) {
+                renderUserList();
+            }
+        }
+
+        function logoutAdmin() {
+            isAdmin = false;
+            document.getElementById('adminMenu').style.display = 'none';
+            document.getElementById('btnLogin').style.display = 'inline-block';
+            document.getElementById('btnLogout').style.display = 'none';
+            renderGallery();
+            renderTexts();
+        }
+
+        function renderUserList() {
+            activeUsers = JSON.parse(localStorage.getItem('web_active_users')) || [];
+            bannedUsers = JSON.parse(localStorage.getItem('web_banned_users')) || [];
+            const userArea = document.getElementById('userListArea');
+            userArea.innerHTML = '';
+
+            if (activeUsers.length === 0) {
+                userArea.innerHTML = '<p style="font-size:12px; color:#64748b;">Chưa có ai truy cập.</p>';
+                return;
+            }
+
+            activeUsers.forEach(uId => {
+                let isBanned = bannedUsers.includes(uId);
+                let isMe = (uId === myUserId);
+                let div = document.createElement('div');
+                div.className = 'user-list-item';
+                div.innerHTML = `
+                    <span><strong>${uId}</strong> ${isMe ? '(Bạn)' : ''}</span>
+                    ${isBanned 
+                        ? `<button class="btn-small-unban" onclick="unbanUser('${uId}')">Mở Ban</button>` 
+                        : `<button class="btn-small-ban" onclick="banSpecificUser('${uId}')">Ban</button>`
+                    }
+                `;
+                userArea.appendChild(div);
+            });
+        }
+
+        function banSpecificUser(uId) {
+            if (confirm(`Chắc chắn muốn BAN người dùng ${uId} chứ?`)) {
+                if (!bannedUsers.includes(uId)) {
+                    bannedUsers.push(uId);
+                    localStorage.setItem('web_banned_users', JSON.stringify(bannedUsers));
+                }
+                if (uId === myUserId) {
+                    localStorage.setItem('is_banned', 'true');
+                }
+                renderUserList();
+                checkBanStatus();
+            }
+        }
+
+        function unbanUser(uId) {
+            if (confirm(`Muốn MỞ BAN cho người dùng ${uId}?`)) {
+                bannedUsers = bannedUsers.filter(id => id !== uId);
+                localStorage.setItem('web_banned_users', JSON.stringify(bannedUsers));
+                if (uId === myUserId) {
+                    localStorage.removeItem('is_banned');
+                }
+                renderUserList();
+                checkBanStatus();
+            }
+        }
+
+        function changePass() {
+            let newPass = prompt("Nhập mật khẩu Admin MỚI:");
+            if (newPass) {
+                ADMIN_PASS = newPass;
+                localStorage.setItem('my_admin_pass', newPass);
+                alert("Đổi mật khẩu thành công: " + newPass);
+            }
+        }
 
         function renderGallery() {
             const gallery = document.getElementById('gallery');
@@ -106,45 +258,10 @@
             });
         }
 
-        function loginAdmin() {
-            let pass = prompt("Nhập mật khẩu Admin của mày:");
-            if (pass === ADMIN_PASS) {
-                isAdmin = true;
-                alert("Đăng nhập thành công!");
-                document.getElementById('adminArea').style.display = 'block';
-                document.getElementById('btnLogin').style.display = 'none';
-                document.getElementById('btnLogout').style.display = 'inline-block';
-                renderGallery();
-            } else if (pass !== null) {
-                alert("Sai mật khẩu rồi cu!");
-            }
-        }
-
-        function logoutAdmin() {
-            isAdmin = false;
-            document.getElementById('adminArea').style.display = 'none';
-            document.getElementById('btnLogin').style.display = 'inline-block';
-            document.getElementById('btnLogout').style.display = 'none';
-            renderGallery();
-        }
-
-        function changePass() {
-            let newPass = prompt("Nhập mật khẩu Admin MỚI:");
-            if (newPass) {
-                ADMIN_PASS = newPass;
-                localStorage.setItem('my_admin_pass', newPass);
-                alert("Đổi mật khẩu thành công thành: " + newPass);
-            }
-        }
-
         function addSingleImage() {
             const fileInput = document.getElementById('imgInput');
             const file = fileInput.files[0];
-
-            if (!file) {
-                alert("Chọn cái ảnh đi đã chứ!");
-                return;
-            }
+            if (!file) { alert("Chọn ảnh đi đã!"); return; }
 
             const reader = new FileReader();
             reader.onload = function(e) {
@@ -152,6 +269,7 @@
                 localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
                 renderGallery();
                 fileInput.value = ''; 
+                document.getElementById('adminMenu').style.display = 'none';
             };
             reader.readAsDataURL(file);
         }
@@ -162,6 +280,108 @@
                 savedImages.splice(index, 1);
                 localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
                 renderGallery();
+            }
+        }
+
+        function addCustomText() {
+            let content = document.getElementById('textInput').value;
+            if (!content) { alert("Nhập nội dung văn bản vào!"); return; }
+
+            let newText = {
+                id: Date.now(),
+                content: content,
+                x: 50,
+                y: 150
+            };
+            savedTexts.push(newText);
+            localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
+            document.getElementById('textInput').value = '';
+            document.getElementById('adminMenu').style.display = 'none';
+            renderTexts();
+        }
+
+        function renderTexts() {
+            const container = document.getElementById('textContainer');
+            document.querySelectorAll('.draggable-text').forEach(el => el.remove());
+
+            savedTexts.forEach((item, index) => {
+                let div = document.createElement('div');
+                div.className = 'draggable-text';
+                div.style.left = item.x + 'px';
+                div.style.top = item.y + 'px';
+                div.innerHTML = `<span style="font-size: 18px; font-weight: bold; color: #0f172a;">${item.content}</span>`;
+                if(isAdmin) {
+                    div.innerHTML += ` <button onclick="deleteText(${index})" style="background:red; color:white; border:none; padding:2px 6px; font-size:10px; border-radius:4px; margin-left:5px; cursor:pointer;">X</button>`;
+                }
+
+                makeDraggable(div, item);
+                container.appendChild(div);
+            });
+        }
+
+        function deleteText(index) {
+            savedTexts.splice(index, 1);
+            localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
+            renderTexts();
+        }
+
+        function makeDraggable(elmnt, dataItem) {
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            elmnt.onmousedown = dragMouseDown;
+            elmnt.ontouchstart = dragTouchStart;
+
+            function dragMouseDown(e) {
+                if(!isAdmin) return;
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                dataItem.y = (elmnt.offsetTop - pos2);
+                dataItem.x = (elmnt.offsetLeft - pos1);
+                elmnt.style.top = dataItem.y + "px";
+                elmnt.style.left = dataItem.x + "px";
+            }
+
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+                localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
+            }
+
+            function dragTouchStart(e) {
+                if(!isAdmin) return;
+                let touch = e.touches[0];
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                document.ontouchend = closeTouchElement;
+                document.ontouchmove = elementTouchDrag;
+            }
+
+            function elementTouchDrag(e) {
+                let touch = e.touches[0];
+                pos1 = pos3 - touch.clientX;
+                pos2 = pos4 - touch.clientY;
+                pos3 = touch.clientX;
+                pos4 = touch.clientY;
+                dataItem.y = (elmnt.offsetTop - pos2);
+                dataItem.x = (elmnt.offsetLeft - pos1);
+                elmnt.style.top = dataItem.y + "px";
+                elmnt.style.left = dataItem.x + "px";
+            }
+
+            function closeTouchElement() {
+                document.ontouchend = null;
+                document.ontouchmove = null;
+                localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
             }
         }
 
@@ -180,6 +400,8 @@
         }
 
         renderGallery();
+        renderTexts();
     </script>
 </body>
-</html>
+    </html>
+    
