@@ -11,10 +11,9 @@
         /* Màn hình Ban */
         #banScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #ef4444; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 2rem; font-weight: bold; padding: 20px; }
         
-        /* Header góc phải */
-        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 20px auto; padding: 0 10px; }
+        /* Header góc trên */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 15px auto; padding: 0 10px; }
         .site-title { font-size: 1.2rem; font-weight: bold; color: #0284c7; }
-        .auth-container { position: relative; display: inline-block; }
 
         button { padding: 8px 16px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
         .btn-login { background: #0ea5e9; color: #fff; }
@@ -23,15 +22,19 @@
         .btn-share { background: #e2e8f0; color: #334155; }
         .btn-share:hover { background: #cbd5e1; }
 
-        /* Menu Admin kiểu Dropdown rộng hơn để chứa danh sách người dùng */
-        .admin-dropdown { display: none; position: absolute; right: 0; top: 40px; background: #ffffff; width: 320px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.15); border: 1px solid #e2e8f0; z-index: 100; text-align: left; padding: 15px; max-height: 80vh; overflow-y: auto; }
+        /* Nút Logo Nổi (Floating Admin Button) */
+        .admin-float-btn { position: fixed; top: 15px; right: 15px; width: 45px; height: 45px; border-radius: 50%; background: #0ea5e9; color: white; border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; z-index: 1000; transition: transform 0.2s; }
+        .admin-float-btn:active { transform: scale(0.9); }
+
+        /* Menu Admin thả xuống */
+        .admin-dropdown { display: none; position: fixed; right: 15px; top: 65px; background: #ffffff; width: 320px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #e2e8f0; z-index: 999; text-align: left; padding: 15px; max-height: 80vh; overflow-y: auto; }
         .admin-dropdown h4 { color: #0ea5e9; margin-bottom: 8px; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-top: 10px; }
         .admin-dropdown h4:first-child { margin-top: 0; }
         .admin-dropdown label { font-size: 12px; color: #64748b; display: block; margin-top: 6px; }
         .admin-dropdown input, .admin-dropdown textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; background: #f8fafc; }
         .admin-dropdown button { width: 100%; margin-top: 8px; }
 
-        /* List người dùng */
+        /* Danh sách người dùng */
         .user-list-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px 10px; border-radius: 6px; margin-top: 6px; border: 1px solid #e2e8f0; font-size: 13px; }
         .btn-small-ban { background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
         .btn-small-unban { background: #22c55e; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
@@ -39,8 +42,8 @@
         .container { max-width: 1000px; margin: 0 auto; }
         .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
 
-        /* Khung văn bản tự do kéo thả */
-        .draggable-text { position: absolute; cursor: move; padding: 10px; user-select: none; z-index: 10; border: 2px dashed transparent; }
+        /* Khung văn bản kéo thả */
+        .draggable-text { position: absolute; cursor: move; padding: 8px 12px; user-select: none; z-index: 10; border: 2px dashed transparent; }
         .draggable-text:hover { border-color: #0ea5e9; background: rgba(14, 165, 233, 0.05); border-radius: 6px; }
 
         .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 10px; }
@@ -49,8 +52,8 @@
         .img-card img:hover { transform: scale(1.05); }
         .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; }
 
-        /* Lightbox xem ảnh to */
-        .lightbox { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        /* Lightbox xem ảnh full */
+        .lightbox { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
         .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
         .lightbox-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; cursor: pointer; font-weight: bold; }
     </style>
@@ -63,30 +66,39 @@
         <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">Biết điều thì cút ra chỗ khác chơi nhé.</p>
     </div>
 
-    <!-- Header góc phải có menu Admin -->
+    <!-- Header chính -->
     <div class="header-bar">
         <div class="site-title">📸 MyGallery</div>
-        <div class="auth-container">
-            <button id="btnLogin" class="btn-login" onclick="toggleMenu()">🔑 Admin Menu</button>
-            <button id="btnLogout" class="btn-logout" onclick="logoutAdmin()" style="display:none;">🚪 Thoát Admin</button>
-            
-            <!-- Menu thả xuống của Admin -->
-            <div id="adminMenu" class="admin-dropdown">
-                <h4>👥 NGƯỜI DÙNG TRUY CẬP</h4>
-                <div id="userListArea"></div>
+    </div>
 
-                <h4>🛠 QUẢN LÝ NỘI DUNG</h4>
-                <label>Tải ảnh lên:</label>
-                <input type="file" id="imgInput" accept="image/*">
-                <button class="btn-login" onclick="addSingleImage()">Đăng Ảnh</button>
+    <!-- Nút Nổ / Logo Admin ở góc phải màn hình -->
+    <div class="admin-float-btn" onclick="toggleMenu()" title="Admin Menu">⚙️</div>
 
-                <label>Thêm văn bản tùy chỉnh:</label>
-                <textarea id="textInput" placeholder="Nhập chữ ở đây..."></textarea>
-                <button class="btn-login" onclick="addCustomText()">Tạo Văn Bản</button>
+    <!-- Menu thả xuống của Admin -->
+    <div id="adminMenu" class="admin-dropdown">
+        <div id="adminContent" style="display:none;">
+            <h4>👥 NGƯỜI DÙNG TRUY CẬP</h4>
+            <div id="userListArea"></div>
 
-                <h4>⚙️ CÀI ĐẶT HỆ THỐNG</h4>
-                <button class="btn-share" onclick="changePass()" style="background:#f1f5f9; color:#0f172a;">Đổi Mật Khẩu</button>
-            </div>
+            <h4>🛠 ĐĂNG NỘI DUNG</h4>
+            <label>Tải ảnh lên:</label>
+            <input type="file" id="imgInput" accept="image/*">
+            <button class="btn-login" onclick="addSingleImage()">Đăng Ảnh</button>
+
+            <label>Thêm chữ tự do:</label>
+            <textarea id="textInput" placeholder="Nhập văn bản..."></textarea>
+            <button class="btn-login" onclick="addCustomText()">Tạo Văn Bản</button>
+
+            <h4>⚙️ TÀI KHOẢN</h4>
+            <button class="btn-share" onclick="changePass()" style="background:#f1f5f9; color:#0f172a;">Đổi Mật Khẩu</button>
+            <button class="btn-logout" onclick="logoutAdmin()">🚪 Đăng Xuất Admin</button>
+        </div>
+
+        <div id="adminLoginForm">
+            <h4>🔑 ĐĂNG NHẬP ADMIN</h4>
+            <label>Mật khẩu:</label>
+            <input type="password" id="passInput" placeholder="Nhập pass admin...">
+            <button class="btn-login" onclick="submitLogin()">Vào Hệ Thống</button>
         </div>
     </div>
 
@@ -95,7 +107,7 @@
             <button class="btn-share" onclick="shareWeb()">🔗 Copy Link Web</button>
         </div>
 
-        <!-- Khu vực chứa văn bản kéo thả -->
+        <!-- Khu vực chữ kéo thả -->
         <div id="textContainer"></div>
 
         <!-- Bộ sưu tập ảnh -->
@@ -109,24 +121,21 @@
     </div>
 
     <script>
-        // Tạo hoặc lấy ID duy nhất cho trình duyệt này
+        // Tạo ID người dùng
         let myUserId = localStorage.getItem('my_user_id');
         if (!myUserId) {
             myUserId = 'Khách #' + Math.floor(1000 + Math.random() * 9000);
             localStorage.setItem('my_user_id', myUserId);
         }
 
-        // Quản lý danh sách người dùng & Banned trong localStorage
         let activeUsers = JSON.parse(localStorage.getItem('web_active_users')) || [];
         let bannedUsers = JSON.parse(localStorage.getItem('web_banned_users')) || [];
 
-        // Đăng ký người dùng hiện tại vào danh sách
         if (!activeUsers.includes(myUserId)) {
             activeUsers.push(myUserId);
             localStorage.setItem('web_active_users', JSON.stringify(activeUsers));
         }
 
-        // Kiểm tra xem ID này có bị Ban không
         function checkBanStatus() {
             if (bannedUsers.includes(myUserId) || localStorage.getItem('is_banned') === 'true') {
                 document.getElementById('banScreen').style.display = 'flex';
@@ -142,36 +151,36 @@
         let savedTexts = JSON.parse(localStorage.getItem('my_web_texts')) || [];
 
         function toggleMenu() {
-            if (!isAdmin) {
-                let pass = prompt("Nhập mật khẩu Admin:");
-                if (pass === ADMIN_PASS) {
-                    isAdmin = true;
-                    alert("Đăng nhập Admin thành công!");
-                    document.getElementById('btnLogin').style.display = 'none';
-                    document.getElementById('btnLogout').style.display = 'inline-block';
-                    renderGallery();
-                    renderTexts();
-                } else if (pass !== null) {
-                    alert("Sai mật khẩu rồi cu!");
-                    return;
-                } else {
-                    return;
-                }
-            }
             let menu = document.getElementById('adminMenu');
             let isOpening = menu.style.display !== 'block';
             menu.style.display = isOpening ? 'block' : 'none';
 
-            if (isOpening) {
+            if (isOpening && isAdmin) {
                 renderUserList();
+            }
+        }
+
+        function submitLogin() {
+            let pass = document.getElementById('passInput').value;
+            if (pass === ADMIN_PASS) {
+                isAdmin = true;
+                alert("Đăng nhập Admin thành công!");
+                document.getElementById('adminLoginForm').style.display = 'none';
+                document.getElementById('adminContent').style.display = 'block';
+                document.getElementById('passInput').value = '';
+                renderUserList();
+                renderGallery();
+                renderTexts();
+            } else {
+                alert("Sai mật khẩu rồi cu!");
             }
         }
 
         function logoutAdmin() {
             isAdmin = false;
+            document.getElementById('adminLoginForm').style.display = 'block';
+            document.getElementById('adminContent').style.display = 'none';
             document.getElementById('adminMenu').style.display = 'none';
-            document.getElementById('btnLogin').style.display = 'inline-block';
-            document.getElementById('btnLogout').style.display = 'none';
             renderGallery();
             renderTexts();
         }
@@ -234,7 +243,7 @@
             if (newPass) {
                 ADMIN_PASS = newPass;
                 localStorage.setItem('my_admin_pass', newPass);
-                alert("Đổi mật khẩu thành công: " + newPass);
+                alert("Đổi mật khẩu thành công thành: " + newPass);
             }
         }
 
@@ -403,5 +412,4 @@
         renderTexts();
     </script>
 </body>
-    </html>
-    
+</html>
