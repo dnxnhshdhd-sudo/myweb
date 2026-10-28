@@ -3,58 +3,104 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Web Ảnh Của Tao</title>
+    <title>Bộ Sưu Tập Ảnh Của Tao</title>
     <style>
-        body { font-family: Arial, sans-serif; background: #121212; color: #fff; margin: 0; padding: 20px; text-align: center; }
-        h1 { color: #00ff88; }
-        .admin-panel { background: #222; padding: 15px; border-radius: 8px; margin-bottom: 20px; border: 1px solid #444; }
-        input, button { padding: 10px; margin: 5px; border-radius: 5px; border: none; font-size: 16px; }
-        button { background: #00ff88; color: #000; font-weight: bold; cursor: pointer; }
-        button:hover { background: #00cc66; }
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 20px; }
-        .img-card { position: relative; border-radius: 8px; overflow: hidden; background: #333; }
-        .img-card img { width: 100%; height: 200px; object-fit: cover; display: block; }
-        .btn-del { position: absolute; top: 5px; right: 5px; background: red; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; display: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; padding: 20px; text-align: center; }
+        
+        /* Header chứa nút admin ở góc phải */
+        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 20px auto; padding: 0 10px; }
+        .site-title { font-size: 1.5rem; font-weight: bold; color: #0284c7; }
+        .auth-container { display: flex; gap: 8px; }
+
+        .container { max-width: 1000px; margin: 0 auto; }
+        h1 { color: #0f172a; margin-bottom: 5px; font-size: 2rem; }
+        p.subtitle { color: #64748b; margin-bottom: 25px; }
+        
+        .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        button { padding: 10px 18px; border-radius: 8px; border: none; font-size: 15px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
+        .btn-login { background: #0ea5e9; color: #fff; }
+        .btn-login:hover { background: #0284c7; }
+        .btn-logout { background: #ef4444; color: #fff; }
+        .btn-share { background: #e2e8f0; color: #334155; }
+        .btn-share:hover { background: #cbd5e1; }
+
+        .admin-panel { background: #ffffff; padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); display: none; text-align: left; }
+        .admin-panel h3 { color: #0ea5e9; margin-bottom: 12px; }
+        .admin-actions { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+        input[type="file"] { background: #f8fafc; padding: 8px; border-radius: 6px; color: #334155; border: 1px solid #cbd5e1; }
+        
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 10px; }
+        .img-card { position: relative; border-radius: 12px; overflow: hidden; background: #ffffff; aspect-ratio: 1 / 1; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+        .img-card img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
+        .img-card img:hover { transform: scale(1.05); }
+        .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; }
+
+        /* Modal xem ảnh full */
+        .lightbox { display: none; position: fixed; z-index: 999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
+        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
+        .lightbox-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; cursor: pointer; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>BỘ SỰU TẬP ẢNH</h1>
-
-    <!-- Nút Đăng Nhập Admin -->
-    <div style="margin-bottom: 20px;">
-        <button id="btnLogin" onclick="loginAdmin()">🔑 Đăng nhập Admin</button>
-        <button id="btnLogout" onclick="logoutAdmin()" style="display:none; background: #ff4444; color: #fff;">🚪 Đăng xuất</button>
+    <!-- Header góc phải có nút đăng nhập admin -->
+    <div class="header-bar">
+        <div class="site-title">📸 MyGallery</div>
+        <div class="auth-container">
+            <button id="btnLogin" class="btn-login" onclick="loginAdmin()">🔑 Admin</button>
+            <button id="btnLogout" class="btn-logout" onclick="logoutAdmin()" style="display:none;">🚪 Thoát</button>
+        </div>
     </div>
 
-    <!-- Khu vực Admin mới thấy -->
-    <div id="adminArea" class="admin-panel" style="display: none;">
-        <h3>🛠 QUYỀN ADMIN: THÊM ẢNH MỚI</h3>
-        <input type="file" id="imgInput" accept="image/*">
-        <button onclick="addSingleImage()">Tải Ảnh Up</button>
+    <div class="container">
+        <h1>BỘ SỰU TẬP ẢNH</h1>
+        <p class="subtitle">Không gian lưu giữ ảnh của riêng tao</p>
+
+        <div class="top-bar">
+            <button class="btn-share" onclick="shareWeb()">🔗 Copy Link Web</button>
+        </div>
+
+        <!-- Khung Admin -->
+        <div id="adminArea" class="admin-panel">
+            <h3>🛠 QUYỀN ADMIN ĐANG BẬT</h3>
+            <div class="admin-actions">
+                <input type="file" id="imgInput" accept="image/*">
+                <button class="btn-login" onclick="addSingleImage()">Tải Ảnh Up</button>
+                <button class="btn-share" onclick="changePass()">Đổi Mật Khẩu</button>
+            </div>
+        </div>
+
+        <!-- Bộ sưu tập ảnh -->
+        <div class="gallery" id="gallery"></div>
     </div>
 
-    <!-- Nơi hiện ảnh cho mọi người xem -->
-    <div class="gallery" id="gallery"></div>
+    <!-- Lightbox xem ảnh to -->
+    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
+        <span class="lightbox-close">&times;</span>
+        <img id="lightboxImg" src="">
+    </div>
 
     <script>
-        // Mật khẩu Admin mày tự chỉnh ở đây nhé (mặc định tao để 123456)
-        const ADMIN_PASS = "123456"; 
+        let ADMIN_PASS = localStorage.getItem('my_admin_pass') || "hungmod34"; 
         let isAdmin = false;
-
-        // Lấy ảnh đã lưu từ trước (trong bộ nhớ trình duyệt)
         let savedImages = JSON.parse(localStorage.getItem('my_web_photos')) || [];
 
         function renderGallery() {
             const gallery = document.getElementById('gallery');
             gallery.innerHTML = '';
             
+            if(savedImages.length === 0) {
+                gallery.innerHTML = '<p style="grid-column: 1/-1; color: #64748b; margin-top: 40px;">Chưa có ảnh nào cả ông cháu ơi!</p>';
+                return;
+            }
+
             savedImages.forEach((imgSrc, index) => {
                 const card = document.createElement('div');
                 card.className = 'img-card';
                 card.innerHTML = `
-                    <img src="${imgSrc}">
-                    <button class="btn-del" style="display: ${isAdmin ? 'block' : 'none'}" onclick="deleteImg(${index})">Xóa</button>
+                    <img src="${imgSrc}" onclick="openLightbox('${imgSrc}')">
+                    <button class="btn-del" style="display: ${isAdmin ? 'block' : 'none'}" onclick="deleteImg(event, ${index})">Xóa</button>
                 `;
                 gallery.appendChild(card);
             });
@@ -64,7 +110,7 @@
             let pass = prompt("Nhập mật khẩu Admin của mày:");
             if (pass === ADMIN_PASS) {
                 isAdmin = true;
-                alert("Đăng nhập thành công! Giờ mày có quyền tải ảnh & xóa ảnh.");
+                alert("Đăng nhập thành công!");
                 document.getElementById('adminArea').style.display = 'block';
                 document.getElementById('btnLogin').style.display = 'none';
                 document.getElementById('btnLogout').style.display = 'inline-block';
@@ -82,12 +128,21 @@
             renderGallery();
         }
 
+        function changePass() {
+            let newPass = prompt("Nhập mật khẩu Admin MỚI:");
+            if (newPass) {
+                ADMIN_PASS = newPass;
+                localStorage.setItem('my_admin_pass', newPass);
+                alert("Đổi mật khẩu thành công thành: " + newPass);
+            }
+        }
+
         function addSingleImage() {
             const fileInput = document.getElementById('imgInput');
             const file = fileInput.files[0];
 
             if (!file) {
-                alert("Chọn cái ảnh nào đã ông cháu!");
+                alert("Chọn cái ảnh đi đã chứ!");
                 return;
             }
 
@@ -101,7 +156,8 @@
             reader.readAsDataURL(file);
         }
 
-        function deleteImg(index) {
+        function deleteImg(e, index) {
+            e.stopPropagation();
             if (confirm("Muốn xóa ảnh này thật à?")) {
                 savedImages.splice(index, 1);
                 localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
@@ -109,7 +165,20 @@
             }
         }
 
-        // Tự động load ảnh khi mở web
+        function openLightbox(src) {
+            document.getElementById('lightboxImg').src = src;
+            document.getElementById('lightbox').style.display = 'flex';
+        }
+
+        function closeLightbox() {
+            document.getElementById('lightbox').style.display = 'none';
+        }
+
+        function shareWeb() {
+            navigator.clipboard.writeText(window.location.href);
+            alert("Đã copy link web thành công!");
+        }
+
         renderGallery();
     </script>
 </body>
