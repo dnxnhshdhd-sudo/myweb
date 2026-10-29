@@ -3,417 +3,373 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bộ Sưu Tập Ảnh Của Tao</title>
+    <title>Minecraft Online - Server Hub</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f8fafc; color: #1e293b; min-height: 100vh; padding: 20px; text-align: center; }
-        
-        /* Màn hình Ban */
-        #banScreen { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; color: #ef4444; z-index: 9999; justify-content: center; align-items: center; flex-direction: column; font-size: 2rem; font-weight: bold; padding: 20px; }
-        
-        /* Header góc trên */
-        .header-bar { display: flex; justify-content: space-between; align-items: center; max-width: 1000px; margin: 0 auto 15px auto; padding: 0 10px; }
-        .site-title { font-size: 1.2rem; font-weight: bold; color: #0284c7; }
+        body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #fff; }
 
-        button { padding: 8px 16px; border-radius: 8px; border: none; font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s; }
-        .btn-login { background: #0ea5e9; color: #fff; }
-        .btn-login:hover { background: #0284c7; }
-        .btn-logout { background: #ef4444; color: #fff; }
-        .btn-share { background: #e2e8f0; color: #334155; }
-        .btn-share:hover { background: #cbd5e1; }
+        /* Màn hình Đăng nhập / Tạo Nick */
+        .overlay-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.98); z-index: 9999; display: flex; justify-content: center; align-items: center; flex-direction: column; }
+        .card-box { background: #1e293b; padding: 30px; border-radius: 12px; border: 1px solid #334155; text-align: center; max-width: 420px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+        .card-box h2 { color: #38bdf8; margin-bottom: 20px; font-size: 22px; }
+        .card-box input { width: 100%; padding: 12px; margin: 10px 0; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #fff; font-size: 15px; text-align: center; }
+        .btn-primary { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #0284c7; color: #fff; font-weight: bold; cursor: pointer; font-size: 16px; margin-top: 10px; transition: 0.2s; }
+        .btn-primary:hover { background: #0369a1; }
 
-        /* Nút Logo Nổi (Floating Admin Button) */
-        .admin-float-btn { position: fixed; top: 15px; right: 15px; width: 45px; height: 45px; border-radius: 50%; background: #0ea5e9; color: white; border: 2px solid #ffffff; box-shadow: 0 4px 10px rgba(0,0,0,0.15); display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; z-index: 1000; transition: transform 0.2s; }
-        .admin-float-btn:active { transform: scale(0.9); }
+        /* Màn hình Danh sách Server */
+        #server-screen { display: none; }
+        .server-list { margin: 15px 0; max-height: 200px; overflow-y: auto; text-align: left; }
+        .server-item { background: #0f172a; border: 1px solid #334155; padding: 12px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: 0.2s; }
+        .server-item:hover { border-color: #38bdf8; background: #1e293b; }
+        .server-info { font-weight: bold; font-size: 14px; }
+        .server-status { font-size: 12px; color: #22c55e; }
 
-        /* Menu Admin thả xuống */
-        .admin-dropdown { display: none; position: fixed; right: 15px; top: 65px; background: #ffffff; width: 320px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); border: 1px solid #e2e8f0; z-index: 999; text-align: left; padding: 15px; max-height: 80vh; overflow-y: auto; }
-        .admin-dropdown h4 { color: #0ea5e9; margin-bottom: 8px; font-size: 0.95rem; border-bottom: 1px solid #f1f5f9; padding-bottom: 4px; margin-top: 10px; }
-        .admin-dropdown h4:first-child { margin-top: 0; }
-        .admin-dropdown label { font-size: 12px; color: #64748b; display: block; margin-top: 6px; }
-        .admin-dropdown input, .admin-dropdown textarea { width: 100%; padding: 8px; margin-top: 4px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 13px; background: #f8fafc; }
-        .admin-dropdown button { width: 100%; margin-top: 8px; }
+        /* UI Trong Game 3D */
+        #game-ui { display: none; }
+        #canvas-container { width: 100%; height: 100%; display: block; }
+        #crosshair { position: fixed; top: 50%; left: 50%; width: 10px; height: 10px; transform: translate(-50%, -50%); pointer-events: none; z-index: 90; }
+        #crosshair::before, #crosshair::after { content: ''; position: absolute; background: rgba(255, 255, 255, 0.8); }
+        #crosshair::before { top: 4px; left: -5px; width: 20px; height: 2px; }
+        #crosshair::after { top: -5px; left: 4px; width: 2px; height: 20px; }
 
-        /* Danh sách người dùng */
-        .user-list-item { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; padding: 6px 10px; border-radius: 6px; margin-top: 6px; border: 1px solid #e2e8f0; font-size: 13px; }
-        .btn-small-ban { background: #ef4444; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
-        .btn-small-unban { background: #22c55e; color: white; padding: 3px 8px; border-radius: 4px; font-size: 11px; width: auto !important; margin: 0 !important; }
+        /* Bảng xếp hạng giờ chơi */
+        #leaderboard { position: fixed; top: 15px; right: 15px; background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; border-radius: 8px; padding: 12px; width: 220px; z-index: 100; font-size: 13px; backdrop-filter: blur(4px); }
+        #leaderboard h3 { font-size: 14px; color: #38bdf8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; text-align: center; }
+        .lb-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
 
-        .container { max-width: 1000px; margin: 0 auto; }
-        .top-bar { display: flex; justify-content: center; gap: 10px; margin-bottom: 25px; }
-
-        /* Khung văn bản kéo thả */
-        .draggable-text { position: absolute; cursor: default; padding: 8px 12px; user-select: none; z-index: 10; border: 2px dashed transparent; }
-        .draggable-text.admin-mode { cursor: move; }
-        .draggable-text.admin-mode:hover { border-color: #0ea5e9; background: rgba(14, 165, 233, 0.05); border-radius: 6px; }
-
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; margin-top: 10px; }
-        .img-card { position: relative; border-radius: 12px; overflow: hidden; background: #ffffff; aspect-ratio: 1 / 1; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .img-card img { width: 100%; height: 100%; object-fit: cover; cursor: pointer; transition: transform 0.3s; }
-        .img-card img:hover { transform: scale(1.05); }
-        .btn-del { position: absolute; top: 8px; right: 8px; background: rgba(239, 68, 68, 0.9); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; display: none; font-size: 13px; z-index: 5; }
-
-        /* Lightbox xem ảnh to */
-        .lightbox { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); justify-content: center; align-items: center; }
-        .lightbox img { max-width: 90%; max-height: 90%; border-radius: 8px; }
-        .lightbox-close { position: absolute; top: 20px; right: 25px; color: #fff; font-size: 35px; cursor: pointer; font-weight: bold; }
+        /* Floating Admin Button & Menu */
+        #admin-btn { position: fixed; top: 15px; left: 15px; width: 42px; height: 42px; background: #0284c7; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; z-index: 101; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        #admin-menu { display: none; position: fixed; top: 65px; left: 15px; background: rgba(15, 23, 42, 0.95); border: 1px solid #334155; border-radius: 10px; width: 280px; padding: 15px; z-index: 101; backdrop-filter: blur(6px); }
+        #admin-menu h4 { color: #38bdf8; margin-bottom: 10px; font-size: 14px; border-bottom: 1px solid #334155; padding-bottom: 4px; }
+        .admin-option { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
     </style>
+
+    <!-- Thư viện Three.js (3D Engine) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    
+    <!-- Thư viện Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <!-- Màn hình khi bị Ban -->
-    <div id="banScreen">
-        <p>🚫 Địt cụ mày bị ban rồi!</p>
-        <p style="font-size: 1rem; color: #94a3b8; margin-top: 15px;">Biết điều thì cút ra chỗ khác chơi nhé.</p>
-    </div>
-
-    <!-- Header chính -->
-    <div class="header-bar">
-        <div class="site-title">📸 MyGallery</div>
-    </div>
-
-    <!-- Nút Logo Admin -->
-    <div class="admin-float-btn" onclick="toggleMenu()" title="Admin Control">⚙️</div>
-
-    <!-- Menu thả xuống của Admin -->
-    <div id="adminMenu" class="admin-dropdown">
-        <div id="adminContent" style="display:none;">
-            <h4>👥 NGƯỜI DÙNG TRUY CẬP</h4>
-            <div id="userListArea"></div>
-
-            <h4>🛠 THÊM ẢNH BẰNG LINK URL</h4>
-            <label>Dán link ảnh vào đây:</label>
-            <input type="text" id="imgUrlInput" placeholder="https://... (Link ảnh trực tiếp)">
-            <button class="btn-login" onclick="addImageByUrl()">Đăng Ảnh Lên Web</button>
-
-            <h4>✍️ THÊM CHỮ KÉO THẢ</h4>
-            <textarea id="textInput" placeholder="Nhập văn bản..."></textarea>
-            <button class="btn-login" onclick="addCustomText()">Tạo Văn Bản</button>
-
-            <h4>⚙️ TÀI KHOẢN</h4>
-            <button class="btn-share" onclick="changePass()" style="background:#f1f5f9; color:#0f172a;">Đổi Mật Khẩu</button>
-            <button class="btn-logout" onclick="logoutAdmin()">🚪 Thoát Quyền Admin</button>
-        </div>
-
-        <div id="adminLoginForm">
-            <h4>🔑 ĐĂNG NHẬP ADMIN</h4>
-            <label>Mật khẩu:</label>
-            <input type="password" id="passInput" placeholder="Nhập pass admin...">
-            <button class="btn-login" onclick="submitLogin()">Vào Hệ Thống</button>
+    <!-- 1. MÀN HÌNH TẠO NICK -->
+    <div id="nick-screen" class="overlay-screen">
+        <div class="card-box">
+            <h2>🎮 TẠO TÀI KHOẢN GAME</h2>
+            <p style="font-size: 13px; color: #94a3b8; margin-bottom: 10px;">Nhập tên nhân vật của bạn để bắt đầu:</p>
+            <input type="text" id="nickname-input" placeholder="Tên tài khoản..." maxlength="15">
+            <button class="btn-primary" onclick="submitNickname()">XÁC NHẬN TẠO NICK</button>
         </div>
     </div>
 
-    <div class="container">
-        <div class="top-bar">
-            <button class="btn-share" onclick="shareWeb()">🔗 Copy Link Web</button>
+    <!-- 2. MÀN HÌNH CHỌN SERVER -->
+    <div id="server-screen" class="overlay-screen">
+        <div class="card-box">
+            <h2>🌍 DANH SÁCH MÁY CHỦ</h2>
+            <p style="font-size: 13px; color: #94a3b8;">Chọn Server để tham gia chơi chung:</p>
+            
+            <div class="server-list">
+                <div class="server-item" onclick="joinServer('Server-SinhTon-1')">
+                    <div>
+                        <div class="server-info">🟩 Server Sinh Tồn #1</div>
+                        <div class="server-status">● Đang hoạt động</div>
+                    </div>
+                    <button style="padding: 6px 12px; background: #22c55e; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer;">VÀO</button>
+                </div>
+                <div class="server-item" onclick="joinServer('Server-Xaydung-2')">
+                    <div>
+                        <div class="server-info">🟦 Server Sáng Tạo #2</div>
+                        <div class="server-status">● Đang hoạt động</div>
+                    </div>
+                    <button style="padding: 6px 12px; background: #22c55e; border: none; border-radius: 4px; color: #fff; font-weight: bold; cursor: pointer;">VÀO</button>
+                </div>
+            </div>
+
+            <button class="btn-primary" style="background: #475569;" onclick="logoutNick()">ĐỔI TÀI KHOẢN</button>
         </div>
-
-        <!-- Khu vực chữ -->
-        <div id="textContainer"></div>
-
-        <!-- Bộ sưu tập ảnh -->
-        <div class="gallery" id="gallery"></div>
     </div>
 
-    <!-- Lightbox xem ảnh to -->
-    <div id="lightbox" class="lightbox" onclick="closeLightbox()">
-        <span class="lightbox-close">&times;</span>
-        <img id="lightboxImg" src="">
+    <!-- 3. MÀN HÌNH TRONG GAME 3D -->
+    <div id="game-ui">
+        <div id="crosshair"></div>
+        <div id="leaderboard">
+            <h3>⏱️ BẢNG XẾP HẠNG</h3>
+            <div id="lb-list"></div>
+        </div>
+
+        <div id="admin-btn" onclick="toggleAdminMenu()">⚙️</div>
+        <div id="admin-menu">
+            <div id="admin-login-sec">
+                <h4>🔑 ĐĂNG NHẬP ADMIN</h4>
+                <input type="password" id="admin-pass" placeholder="Mật khẩu Admin..." style="width:100%; padding:6px; margin-bottom:8px; border-radius:4px; border:1px solid #334155; background:#0f172a; color:#fff;">
+                <button onclick="loginAdmin()" style="width:100%; padding:6px; background:#0284c7; border:none; color:#fff; border-radius:4px; font-weight:bold; cursor:pointer;">Xác nhận</button>
+            </div>
+            <div id="admin-controls-sec" style="display:none;">
+                <h4>⚒️ QUYỀN HẠN ADMIN</h4>
+                <div class="admin-option"><span>Bay (Fly Mode)</span><input type="checkbox" onchange="toggleFly(this.checked)"></div>
+                <div class="admin-option"><span>Chạy nhanh (Speed x3)</span><input type="checkbox" onchange="toggleSpeed(this.checked)"></div>
+                <div class="admin-option"><span>Xuyên tường (Noclip)</span><input type="checkbox" onchange="toggleNoclip(this.checked)"></div>
+            </div>
+        </div>
+
+        <div id="canvas-container"></div>
     </div>
 
     <script>
-        let myUserId = localStorage.getItem('my_user_id');
-        if (!myUserId) {
-            myUserId = 'Khách #' + Math.floor(1000 + Math.random() * 9000);
-            localStorage.setItem('my_user_id', myUserId);
-        }
-
-        let activeUsers = JSON.parse(localStorage.getItem('web_active_users')) || [];
-        let bannedUsers = JSON.parse(localStorage.getItem('web_banned_users')) || [];
-
-        if (!activeUsers.includes(myUserId)) {
-            activeUsers.push(myUserId);
-            localStorage.setItem('web_active_users', JSON.stringify(activeUsers));
-        }
-
-        function checkBanStatus() {
-            if (bannedUsers.includes(myUserId) || localStorage.getItem('is_banned') === 'true') {
-                document.getElementById('banScreen').style.display = 'flex';
-            } else {
-                document.getElementById('banScreen').style.display = 'none';
-            }
-        }
-        checkBanStatus();
-
-        let ADMIN_PASS = localStorage.getItem('my_admin_pass') || "hungmod34"; 
-        let isAdmin = false;
+        // --- CẤU HÌNH FIREBASE THẬT CỦA MÀY ---
+        const firebaseConfig = {
+            apiKey: "AIzaSyCb8XBNv-lBr_6cXHn2zYqbEBCBDUtVRIk",
+            authDomain: "my-minecraft-game-8bcf1.firebaseapp.com",
+            projectId: "my-minecraft-game-8bcf1",
+            storageBucket: "my-minecraft-game-8bcf1.firebasestorage.app",
+            messagingSenderId: "603818428582",
+            appId: "1:603818428582:web:adfdd957e04dd4de468c67",
+            measurementId: "G-4309HECZPN",
+            databaseURL: "https://my-minecraft-game-8bcf1-default-rtdb.firebaseio.com/"
+        };
         
-        let savedImages = JSON.parse(localStorage.getItem('my_web_photos')) || [];
-        let savedTexts = JSON.parse(localStorage.getItem('my_web_texts')) || [];
+        let db = null;
+        try {
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) { console.log("Lỗi kết nối Firebase:", e); }
 
-        function toggleMenu() {
-            let menu = document.getElementById('adminMenu');
-            let isOpening = menu.style.display !== 'block';
-            menu.style.display = isOpening ? 'block' : 'none';
+        let playerObj = { id: '', name: '', isAdmin: false, playTime: 0 };
+        let currentServer = '';
+        let ADMIN_PASS = "hungmod34";
 
-            if (isOpening && isAdmin) {
-                renderUserList();
-            }
-        }
+        let scene, camera, renderer, blocks = [];
+        let worldBlocks = {};
+        let isFly = false, isSpeed = false, isNoclip = false;
+        let keys = {}, mouseRaycaster = new THREE.Raycaster(), mouseVec = new THREE.Vector2(0,0);
 
-        function submitLogin() {
-            let pass = document.getElementById('passInput').value;
-            if (pass === ADMIN_PASS) {
-                isAdmin = true;
-                alert("Đăng nhập Admin thành công!");
-                document.getElementById('adminLoginForm').style.display = 'none';
-                document.getElementById('adminContent').style.display = 'block';
-                document.getElementById('passInput').value = '';
-                renderUserList();
-                renderGallery();
-                renderTexts();
+        window.onload = function() {
+            let savedName = localStorage.getItem('mc_user_name');
+            let savedId = localStorage.getItem('mc_user_id');
+
+            if (savedName && savedId) {
+                playerObj.name = savedName;
+                playerObj.id = savedId;
+                document.getElementById('nick-screen').style.display = 'none';
+                document.getElementById('server-screen').style.display = 'flex';
             } else {
-                alert("Sai mật khẩu rồi cu!");
+                document.getElementById('nick-screen').style.display = 'flex';
+                document.getElementById('server-screen').style.display = 'none';
+            }
+        };
+
+        function submitNickname() {
+            const nameInput = document.getElementById('nickname-input').value.trim();
+            if (!nameInput) { alert("Vui lòng nhập tên tài khoản!"); return; }
+
+            playerObj.name = nameInput;
+            playerObj.id = 'usr_' + Math.floor(Math.random() * 89999 + 10000);
+
+            localStorage.setItem('mc_user_name', playerObj.name);
+            localStorage.setItem('mc_user_id', playerObj.id);
+
+            document.getElementById('nick-screen').style.display = 'none';
+            document.getElementById('server-screen').style.display = 'flex';
+        }
+
+        function logoutNick() {
+            localStorage.removeItem('mc_user_name');
+            localStorage.removeItem('mc_user_id');
+            location.reload();
+        }
+
+        function joinServer(serverName) {
+            currentServer = serverName;
+            document.getElementById('server-screen').style.display = 'none';
+            document.getElementById('game-ui').style.display = 'block';
+
+            init3DEngine();
+
+            if (db) {
+                listenToWorldData();
+            }
+
+            setInterval(() => {
+                playerObj.playTime++;
+                updateLeaderboard();
+            }, 1000);
+        }
+
+        function init3DEngine() {
+            const container = document.getElementById('canvas-container');
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0x87ceeb);
+
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(0, 2, 5);
+
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            container.appendChild(renderer.domElement);
+
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            scene.add(ambientLight);
+
+            createBaseFloor();
+
+            window.addEventListener('resize', onWindowResize);
+            document.addEventListener('keydown', (e) => keys[e.code] = true);
+            document.addEventListener('keyup', (e) => keys[e.code] = false);
+            document.addEventListener('mousedown', onInteractBlock);
+
+            renderer.domElement.addEventListener('click', () => {
+                renderer.domElement.requestPointerLock();
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (document.pointerLockElement === renderer.domElement) {
+                    camera.rotation.y -= e.movementX * 0.002;
+                    camera.rotation.x -= e.movementY * 0.002;
+                    camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
+                }
+            });
+
+            animate();
+        }
+
+        function createBaseFloor() {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshLambertMaterial({ color: 0x4bc031 });
+            for (let x = -15; x <= 15; x++) {
+                for (let z = -15; z <= 15; z++) {
+                    const block = new THREE.Mesh(geometry, material);
+                    block.position.set(x, 0, z);
+                    scene.add(block);
+                    blocks.push(block);
+                    worldBlocks[`${x},0,${z}`] = { ownerId: 'system', mesh: block };
+                }
             }
         }
 
-        function logoutAdmin() {
-            isAdmin = false;
-            document.getElementById('adminLoginForm').style.display = 'block';
-            document.getElementById('adminContent').style.display = 'none';
-            document.getElementById('adminMenu').style.display = 'none';
-            renderGallery();
-            renderTexts();
-            alert("Đã thoát quyền Admin!");
-        }
+        function onInteractBlock(e) {
+            if (document.pointerLockElement !== renderer.domElement) return;
 
-        function renderUserList() {
-            activeUsers = JSON.parse(localStorage.getItem('web_active_users')) || [];
-            bannedUsers = JSON.parse(localStorage.getItem('web_banned_users')) || [];
-            const userArea = document.getElementById('userListArea');
-            userArea.innerHTML = '';
+            mouseRaycaster.setFromCamera(mouseVec, camera);
+            const intersects = mouseRaycaster.intersectObjects(blocks);
 
-            if (activeUsers.length === 0) {
-                userArea.innerHTML = '<p style="font-size:12px; color:#64748b;">Chưa có ai truy cập.</p>';
-                return;
-            }
+            if (intersects.length > 0) {
+                const intersect = intersects[0];
 
-            activeUsers.forEach(uId => {
-                let isBanned = bannedUsers.includes(uId);
-                let isMe = (uId === myUserId);
-                let div = document.createElement('div');
-                div.className = 'user-list-item';
-                div.innerHTML = `
-                    <span><strong>${uId}</strong> ${isMe ? '(Bạn)' : ''}</span>
-                    ${isBanned 
-                        ? `<button class="btn-small-unban" onclick="unbanUser('${uId}')">Mở Ban</button>` 
-                        : `<button class="btn-small-ban" onclick="banSpecificUser('${uId}')">Ban</button>`
+                if (e.button === 0) {
+                    const pos = intersect.object.position;
+                    const blockKey = `${pos.x},${pos.y},${pos.z}`;
+                    const targetBlock = worldBlocks[blockKey];
+
+                    if (targetBlock) {
+                        if (playerObj.isAdmin || targetBlock.ownerId === playerObj.id) {
+                            scene.remove(intersect.object);
+                            blocks = blocks.filter(b => b !== intersect.object);
+                            delete worldBlocks[blockKey];
+
+                            if (db) db.ref(`servers/${currentServer}/blocks/${blockKey}`).remove();
+                        } else {
+                            alert("Bạn không thể phá khối do người khác đặt!");
+                        }
                     }
-                `;
-                userArea.appendChild(div);
+                }
+                else if (e.button === 2) {
+                    const normal = intersect.face.normal;
+                    const newPos = intersect.object.position.clone().add(normal);
+                    const blockKey = `${newPos.x},${newPos.y},${newPos.z}`;
+
+                    spawnBlock(newPos.x, newPos.y, newPos.z, playerObj.id);
+
+                    if (db) {
+                        db.ref(`servers/${currentServer}/blocks/${blockKey}`).set({
+                            x: newPos.x, y: newPos.y, z: newPos.z,
+                            ownerId: playerObj.id
+                        });
+                    }
+                }
+            }
+        }
+
+        function spawnBlock(x, y, z, ownerId) {
+            const geometry = new THREE.BoxGeometry(1, 1, 1);
+            const material = new THREE.MeshLambertMaterial({ color: 0xb87333 });
+            const block = new THREE.Mesh(geometry, material);
+            block.position.set(x, y, z);
+            scene.add(block);
+            blocks.push(block);
+            worldBlocks[`${x},${y},${z}`] = { ownerId: ownerId, mesh: block };
+        }
+
+        function listenToWorldData() {
+            db.ref(`servers/${currentServer}/blocks`).on('child_added', (snapshot) => {
+                const b = snapshot.val();
+                const key = `${b.x},${b.y},${b.z}`;
+                if (!worldBlocks[key]) {
+                    spawnBlock(b.x, b.y, b.z, b.ownerId);
+                }
+            });
+
+            db.ref(`servers/${currentServer}/blocks`).on('child_removed', (snapshot) => {
+                const key = snapshot.key;
+                if (worldBlocks[key]) {
+                    scene.remove(worldBlocks[key].mesh);
+                    blocks = blocks.filter(item => item !== worldBlocks[key].mesh);
+                    delete worldBlocks[key];
+                }
             });
         }
 
-        function banSpecificUser(uId) {
-            if (confirm(`Chắc chắn muốn BAN người dùng ${uId} chứ?`)) {
-                if (!bannedUsers.includes(uId)) {
-                    bannedUsers.push(uId);
-                    localStorage.setItem('web_banned_users', JSON.stringify(bannedUsers));
-                }
-                if (uId === myUserId) {
-                    localStorage.setItem('is_banned', 'true');
-                }
-                renderUserList();
-                checkBanStatus();
-            }
-        }
+        function animate() {
+            requestAnimationFrame(animate);
+            let speed = isSpeed ? 0.45 : 0.15;
+            if (keys['KeyW']) camera.translateZ(-speed);
+            if (keys['KeyS']) camera.translateZ(speed);
+            if (keys['KeyA']) camera.translateX(-speed);
+            if (keys['KeyD']) camera.translateX(speed);
 
-        function unbanUser(uId) {
-            if (confirm(`Muốn MỞ BAN cho người dùng ${uId}?`)) {
-                bannedUsers = bannedUsers.filter(id => id !== uId);
-                localStorage.setItem('web_banned_users', JSON.stringify(bannedUsers));
-                if (uId === myUserId) {
-                    localStorage.removeItem('is_banned');
-                }
-                renderUserList();
-                checkBanStatus();
-            }
-        }
-
-        function changePass() {
-            let newPass = prompt("Nhập mật khẩu Admin MỚI:");
-            if (newPass) {
-                ADMIN_PASS = newPass;
-                localStorage.setItem('my_admin_pass', newPass);
-                alert("Đổi mật khẩu thành công thành: " + newPass);
-            }
-        }
-
-        function renderGallery() {
-            const gallery = document.getElementById('gallery');
-            gallery.innerHTML = '';
-            
-            if(savedImages.length === 0) {
-                gallery.innerHTML = '<p style="grid-column: 1/-1; color: #64748b; margin-top: 40px;">Chưa có ảnh nào cả ông cháu ơi!</p>';
-                return;
+            if (isFly) {
+                if (keys['Space']) camera.position.y += speed;
+                if (keys['ShiftLeft']) camera.position.y -= speed;
+            } else if (!isNoclip) {
+                camera.position.y = 2;
             }
 
-            savedImages.forEach((imgSrc, index) => {
-                const card = document.createElement('div');
-                card.className = 'img-card';
-                card.innerHTML = `
-                    <img src="${imgSrc}" onclick="openLightbox('${imgSrc}')">
-                    <button class="btn-del" style="display: ${isAdmin ? 'block' : 'none'}" onclick="deleteImg(event, ${index})">Xóa</button>
-                `;
-                gallery.appendChild(card);
-            });
+            renderer.render(scene, camera);
         }
 
-        function addImageByUrl() {
-            const urlInput = document.getElementById('imgUrlInput');
-            const url = urlInput.value.trim();
-            if (!url) { alert("Chưa nhập link ảnh kìa cu!"); return; }
-
-            savedImages.push(url);
-            localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
-            renderGallery();
-            urlInput.value = ''; 
-            document.getElementById('adminMenu').style.display = 'none';
-            alert("Thêm ảnh thành công! Mọi người đã thấy.");
+        function toggleAdminMenu() {
+            const m = document.getElementById('admin-menu');
+            m.style.display = (m.style.display === 'block') ? 'none' : 'block';
         }
 
-        function deleteImg(e, index) {
-            e.stopPropagation();
-            if (confirm("Muốn xóa ảnh này thật à?")) {
-                savedImages.splice(index, 1);
-                localStorage.setItem('my_web_photos', JSON.stringify(savedImages));
-                renderGallery();
-            }
+        function loginAdmin() {
+            if (document.getElementById('admin-pass').value === ADMIN_PASS) {
+                playerObj.isAdmin = true;
+                document.getElementById('admin-login-sec').style.display = 'none';
+                document.getElementById('admin-controls-sec').style.display = 'block';
+                updateLeaderboard();
+                alert("Đã đăng nhập Admin!");
+            } else { alert("Sai mật khẩu!"); }
         }
 
-        function addCustomText() {
-            let content = document.getElementById('textInput').value;
-            if (!content) { alert("Nhập nội dung văn bản vào!"); return; }
+        function toggleFly(v) { isFly = v; }
+        function toggleSpeed(v) { isSpeed = v; }
+        function toggleNoclip(v) { isNoclip = v; }
 
-            let newText = {
-                id: Date.now(),
-                content: content,
-                x: 50,
-                y: 150
-            };
-            savedTexts.push(newText);
-            localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
-            document.getElementById('textInput').value = '';
-            document.getElementById('adminMenu').style.display = 'none';
-            renderTexts();
+        function updateLeaderboard() {
+            const lb = document.getElementById('lb-list');
+            lb.innerHTML = '';
+            const badge = playerObj.isAdmin ? ' ⚒️' : '';
+            const m = Math.floor(playerObj.playTime / 60);
+            const s = playerObj.playTime % 60;
+            lb.innerHTML = `<div class="lb-item"><span><strong>${playerObj.name}</strong>${badge}</span><span>${m}m ${s}s</span></div>`;
         }
 
-        function renderTexts() {
-            const container = document.getElementById('textContainer');
-            document.querySelectorAll('.draggable-text').forEach(el => el.remove());
-
-            savedTexts.forEach((item, index) => {
-                let div = document.createElement('div');
-                div.className = isAdmin ? 'draggable-text admin-mode' : 'draggable-text';
-                div.style.left = item.x + 'px';
-                div.style.top = item.y + 'px';
-                div.innerHTML = `<span style="font-size: 18px; font-weight: bold; color: #0f172a;">${item.content}</span>`;
-                if(isAdmin) {
-                    div.innerHTML += ` <button onclick="deleteText(${index})" style="background:red; color:white; border:none; padding:2px 6px; font-size:10px; border-radius:4px; margin-left:5px; cursor:pointer;">X</button>`;
-                }
-
-                makeDraggable(div, item);
-                container.appendChild(div);
-            });
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
         }
-
-        function deleteText(index) {
-            savedTexts.splice(index, 1);
-            localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
-            renderTexts();
-        }
-
-        function makeDraggable(elmnt, dataItem) {
-            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
-            elmnt.onmousedown = dragMouseDown;
-            elmnt.ontouchstart = dragTouchStart;
-
-            function dragMouseDown(e) {
-                if(!isAdmin) return;
-                e.preventDefault();
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                document.onmouseup = closeDragElement;
-                document.onmousemove = elementDrag;
-            }
-
-            function elementDrag(e) {
-                e.preventDefault();
-                pos1 = pos3 - e.clientX;
-                pos2 = pos4 - e.clientY;
-                pos3 = e.clientX;
-                pos4 = e.clientY;
-                dataItem.y = (elmnt.offsetTop - pos2);
-                dataItem.x = (elmnt.offsetLeft - pos1);
-                elmnt.style.top = dataItem.y + "px";
-                elmnt.style.left = dataItem.x + "px";
-            }
-
-            function closeDragElement() {
-                document.onmouseup = null;
-                document.onmousemove = null;
-                localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
-            }
-
-            function dragTouchStart(e) {
-                if(!isAdmin) return;
-                let touch = e.touches[0];
-                pos3 = touch.clientX;
-                pos4 = touch.clientY;
-                document.ontouchend = closeTouchElement;
-                document.ontouchmove = elementTouchDrag;
-            }
-
-            function elementTouchDrag(e) {
-                let touch = e.touches[0];
-                pos1 = pos3 - touch.clientX;
-                pos2 = pos4 - touch.clientY;
-                pos3 = touch.clientX;
-                pos4 = touch.clientY;
-                dataItem.y = (elmnt.offsetTop - pos2);
-                dataItem.x = (elmnt.offsetLeft - pos1);
-                elmnt.style.top = dataItem.y + "px";
-                elmnt.style.left = dataItem.x + "px";
-            }
-
-            function closeTouchElement() {
-                document.ontouchend = null;
-                document.ontouchmove = null;
-                localStorage.setItem('my_web_texts', JSON.stringify(savedTexts));
-            }
-        }
-
-        function openLightbox(src) {
-            document.getElementById('lightboxImg').src = src;
-            document.getElementById('lightbox').style.display = 'flex';
-        }
-
-        function closeLightbox() {
-            document.getElementById('lightbox').style.display = 'none';
-        }
-
-        echoShare = function() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("Đã copy link web thành công!");
-        }
-
-        function shareWeb() {
-            navigator.clipboard.writeText(window.location.href);
-            alert("Đã copy link web thành công!");
-        }
-
-        renderGallery();
-        renderTexts();
     </script>
 </body>
 </html>
