@@ -2,10 +2,10 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Online - Server Hub</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Minecraft Online - Mobile Controls</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
         body, html { width: 100%; height: 100%; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #0f172a; color: #fff; }
 
         /* Màn hình Đăng nhập / Tạo Nick */
@@ -33,9 +33,26 @@
         #crosshair::after { top: -5px; left: 4px; width: 2px; height: 20px; }
 
         /* Bảng xếp hạng giờ chơi */
-        #leaderboard { position: fixed; top: 15px; right: 15px; background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; border-radius: 8px; padding: 12px; width: 220px; z-index: 100; font-size: 13px; backdrop-filter: blur(4px); }
-        #leaderboard h3 { font-size: 14px; color: #38bdf8; margin-bottom: 8px; border-bottom: 1px solid #334155; padding-bottom: 4px; text-align: center; }
-        .lb-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        #leaderboard { position: fixed; top: 15px; right: 15px; background: rgba(15, 23, 42, 0.85); border: 1px solid #334155; border-radius: 8px; padding: 12px; width: 200px; z-index: 100; font-size: 12px; backdrop-filter: blur(4px); pointer-events: none; }
+        #leaderboard h3 { font-size: 13px; color: #38bdf8; margin-bottom: 6px; border-bottom: 1px solid #334155; padding-bottom: 4px; text-align: center; }
+        .lb-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; }
+
+        /* Cụm nút di chuyển phong cách Minecraft PE (D-Pad) */
+        #mobile-controls { position: fixed; bottom: 20px; left: 20px; width: 160px; height: 160px; z-index: 150; display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: repeat(3, 1fr); gap: 4px; pointer-events: auto; }
+        .mc-btn { background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 12px; color: white; font-size: 20px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(2px); transition: background 0.1s; }
+        .mc-btn:active, .mc-btn.pressed { background: rgba(255, 255, 255, 0.5); border-color: #fff; }
+        
+        #btn-up { grid-column: 2; grid-row: 1; }
+        #btn-left { grid-column: 1; grid-row: 2; }
+        #btn-right { grid-column: 3; grid-row: 2; }
+        #btn-down { grid-column: 2; grid-row: 3; }
+
+        /* Cụm nút hành động bên phải (Nhảy / Phá / Đặt block) */
+        #action-controls { position: fixed; bottom: 20px; right: 20px; display: flex; gap: 12px; z-index: 150; }
+        .action-btn { width: 65px; height: 65px; background: rgba(255, 255, 255, 0.25); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 50%; color: white; font-size: 14px; font-weight: bold; display: flex; justify-content: center; align-items: center; cursor: pointer; backdrop-filter: blur(2px); box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .action-btn:active { background: rgba(255, 255, 255, 0.6); transform: scale(0.95); }
+        #btn-break { background: rgba(239, 68, 68, 0.4); border-color: rgba(239, 68, 68, 0.8); }
+        #btn-place { background: rgba(34, 197, 94, 0.4); border-color: rgba(34, 197, 94, 0.8); }
 
         /* Floating Admin Button & Menu */
         #admin-btn { position: fixed; top: 15px; left: 15px; width: 42px; height: 42px; background: #0284c7; border-radius: 50%; border: 2px solid #fff; display: flex; justify-content: center; align-items: center; font-size: 20px; cursor: pointer; z-index: 101; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
@@ -44,7 +61,7 @@
         .admin-option { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; font-size: 13px; }
     </style>
 
-    <!-- Thư viện Three.js (3D Engine) -->
+    <!-- Thư viện Three.js -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
     <!-- Thư viện Firebase SDK -->
@@ -98,6 +115,21 @@
             <div id="lb-list"></div>
         </div>
 
+        <!-- Cụm nút D-Pad di chuyển ảo giống Minecraft PE -->
+        <div id="mobile-controls">
+            <div class="mc-btn" id="btn-up" ontouchstart="setKey('KeyW', true)" ontouchend="setKey('KeyW', false)" onmousedown="setKey('KeyW', true)" onmouseup="setKey('KeyW', false)">▲</div>
+            <div class="mc-btn" id="btn-left" ontouchstart="setKey('KeyA', true)" ontouchend="setKey('KeyA', false)" onmousedown="setKey('KeyA', true)" onmouseup="setKey('KeyA', false)">◀</div>
+            <div class="mc-btn" id="btn-right" ontouchstart="setKey('KeyD', true)" ontouchend="setKey('KeyD', false)" onmousedown="setKey('KeyD', true)" onmouseup="setKey('KeyD', false)">▶</div>
+            <div class="mc-btn" id="btn-down" ontouchstart="setKey('KeyS', true)" ontouchend="setKey('KeyS', false)" onmousedown="setKey('KeyS', true)" onmouseup="setKey('KeyS', false)">▼</div>
+        </div>
+
+        <!-- Cụm nút hành động (Phá, Đặt, Nhảy) -->
+        <div id="action-controls">
+            <div class="action-btn" id="btn-break" onclick="doAction('break')">⛏️ Phá</div>
+            <div class="action-btn" id="btn-place" onclick="doAction('place')">🧱 Đặt</div>
+            <div class="action-btn" id="btn-jump" ontouchstart="setKey('Space', true)" ontouchend="setKey('Space', false)" onmousedown="setKey('Space', true)" onmouseup="setKey('Space', false)">⬆️ Nhảy</div>
+        </div>
+
         <div id="admin-btn" onclick="toggleAdminMenu()">⚙️</div>
         <div id="admin-menu">
             <div id="admin-login-sec">
@@ -117,7 +149,7 @@
     </div>
 
     <script>
-        // --- CẤU HÌNH FIREBASE THẬT CỦA MÀY ---
+        // --- CẤU HÌNH FIREBASE CỦA MÀY ---
         const firebaseConfig = {
             apiKey: "AIzaSyCb8XBNv-lBr_6cXHn2zYqbEBCBDUtVRIk",
             authDomain: "my-minecraft-game-8bcf1.firebaseapp.com",
@@ -216,21 +248,36 @@
             window.addEventListener('resize', onWindowResize);
             document.addEventListener('keydown', (e) => keys[e.code] = true);
             document.addEventListener('keyup', (e) => keys[e.code] = false);
-            document.addEventListener('mousedown', onInteractBlock);
 
-            renderer.domElement.addEventListener('click', () => {
-                renderer.domElement.requestPointerLock();
+            // Điều khiển góc nhìn bằng cảm ứng vuốt màn hình hoặc chuột máy tính
+            let isDragging = false;
+            let prevMouseX = 0, prevMouseY = 0;
+
+            renderer.domElement.addEventListener('pointerdown', (e) => {
+                isDragging = true;
+                prevMouseX = e.clientX;
+                prevMouseY = e.clientY;
             });
 
-            document.addEventListener('mousemove', (e) => {
-                if (document.pointerLockElement === renderer.domElement) {
-                    camera.rotation.y -= e.movementX * 0.002;
-                    camera.rotation.x -= e.movementY * 0.002;
-                    camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
-                }
+            window.addEventListener('pointermove', (e) => {
+                if (!isDragging) return;
+                let movementX = e.clientX - prevMouseX;
+                let movementY = e.clientY - prevMouseY;
+                prevMouseX = e.clientX;
+                prevMouseY = e.clientY;
+
+                camera.rotation.y -= movementX * 0.003;
+                camera.rotation.x -= movementY * 0.003;
+                camera.rotation.x = Math.max(-Math.PI/2, Math.min(Math.PI/2, camera.rotation.x));
             });
+
+            window.addEventListener('pointerup', () => { isDragging = false; });
 
             animate();
+        }
+
+        function setKey(code, status) {
+            keys[code] = status;
         }
 
         function createBaseFloor() {
@@ -247,16 +294,15 @@
             }
         }
 
-        function onInteractBlock(e) {
-            if (document.pointerLockElement !== renderer.domElement) return;
-
+        // Xử lý nút hành động Phá/Đặt block trên màn hình điện thoại
+        function doAction(actionType) {
             mouseRaycaster.setFromCamera(mouseVec, camera);
             const intersects = mouseRaycaster.intersectObjects(blocks);
 
             if (intersects.length > 0) {
                 const intersect = intersects[0];
 
-                if (e.button === 0) {
+                if (actionType === 'break') {
                     const pos = intersect.object.position;
                     const blockKey = `${pos.x},${pos.y},${pos.z}`;
                     const targetBlock = worldBlocks[blockKey];
@@ -273,7 +319,7 @@
                         }
                     }
                 }
-                else if (e.button === 2) {
+                else if (actionType === 'place') {
                     const normal = intersect.face.normal;
                     const newPos = intersect.object.position.clone().add(normal);
                     const blockKey = `${newPos.x},${newPos.y},${newPos.z}`;
@@ -324,52 +370,4 @@
             let speed = isSpeed ? 0.45 : 0.15;
             if (keys['KeyW']) camera.translateZ(-speed);
             if (keys['KeyS']) camera.translateZ(speed);
-            if (keys['KeyA']) camera.translateX(-speed);
-            if (keys['KeyD']) camera.translateX(speed);
-
-            if (isFly) {
-                if (keys['Space']) camera.position.y += speed;
-                if (keys['ShiftLeft']) camera.position.y -= speed;
-            } else if (!isNoclip) {
-                camera.position.y = 2;
-            }
-
-            renderer.render(scene, camera);
-        }
-
-        function toggleAdminMenu() {
-            const m = document.getElementById('admin-menu');
-            m.style.display = (m.style.display === 'block') ? 'none' : 'block';
-        }
-
-        function loginAdmin() {
-            if (document.getElementById('admin-pass').value === ADMIN_PASS) {
-                playerObj.isAdmin = true;
-                document.getElementById('admin-login-sec').style.display = 'none';
-                document.getElementById('admin-controls-sec').style.display = 'block';
-                updateLeaderboard();
-                alert("Đã đăng nhập Admin!");
-            } else { alert("Sai mật khẩu!"); }
-        }
-
-        function toggleFly(v) { isFly = v; }
-        function toggleSpeed(v) { isSpeed = v; }
-        function toggleNoclip(v) { isNoclip = v; }
-
-        function updateLeaderboard() {
-            const lb = document.getElementById('lb-list');
-            lb.innerHTML = '';
-            const badge = playerObj.isAdmin ? ' ⚒️' : '';
-            const m = Math.floor(playerObj.playTime / 60);
-            const s = playerObj.playTime % 60;
-            lb.innerHTML = `<div class="lb-item"><span><strong>${playerObj.name}</strong>${badge}</span><span>${m}m ${s}s</span></div>`;
-        }
-
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-    </script>
-</body>
-</html>
+            if (keys['KeyA']) camera.tran
